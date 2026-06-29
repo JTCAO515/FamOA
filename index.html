@@ -169,13 +169,13 @@ CREATE POLICY "allow_all" ON approvals
   </div>
   <div class="tab-content">
     <div class="tab-pane active" id="tab-submit">
-      <div class="form-group"><label>OA需求描述 <span class="req">*</span></label><textarea id="f_desc" placeholder="请描述需要审批的事项" rows="3"></textarea></div>
+      <div class="form-group"><label>OA项目 <span class="req">*</span></label><textarea id="f_desc" placeholder="请描述需要审批的事项" rows="3"></textarea></div>
       <div class="form-group"><label>项目类别 <span class="req">*</span></label>
-        <select id="f_cat"><option value="">请选择</option><option value="办公用品采购">办公用品采购</option><option value="家庭维修">家庭维修</option><option value="差旅报销">差旅报销</option><option value="礼金礼赠">礼金礼赠</option><option value="其他">其他</option></select>
+        <select id="f_cat"><option value="">请选择</option><option value="外出申请">1.外出申请</option><option value="爱好支出">2.爱好支出</option><option value="奢侈品支出">3.奢侈品支出</option><option value="多金支出">4.多金支出</option><option value="人情往来">5.人情往来</option><option value="家庭支出">6.家庭支出</option><option value="理财规划">7.理财规划</option></select>
       </div>
-      <div class="form-group"><label>预算金额 <span class="req">*</span></label><input type="number" id="f_budget" placeholder="请输入金额（元）" min="0" step="1"></div>
-      <div class="form-group"><label>执行时间 <span class="req">*</span></label><input type="date" id="f_date"></div>
-      <div class="form-group"><label>申请理由 <span class="req">*</span></label><textarea id="f_reason" placeholder="请详细说明申请理由" rows="3"></textarea></div>
+      <div class="form-group"><label>预算金额</label><input type="number" id="f_budget" placeholder="请输入金额（元）" min="0" step="1"></div>
+      <div class="form-group"><label>执行时间</label><input type="date" id="f_date"></div>
+      <div class="form-group"><label>申请理由</label><textarea id="f_reason" placeholder="请详细说明申请理由" rows="3"></textarea></div>
       <button class="submit-btn" id="submitBtn" onclick="submitRequest()" disabled>提交申请</button>
     </div>
     <div class="tab-pane" id="tab-approve"></div>
@@ -190,13 +190,13 @@ CREATE POLICY "allow_all" ON approvals
 <div class="modal-overlay" id="resubmitModal">
   <div class="modal-box">
     <h3>📄 再次提交</h3>
-    <div class="form-group"><label>OA需求描述 <span class="req">*</span></label><textarea id="r_desc" rows="3"></textarea></div>
+    <div class="form-group"><label>OA项目 <span class="req">*</span></label><textarea id="r_desc" rows="3"></textarea></div>
     <div class="form-group"><label>项目类别 <span class="req">*</span></label>
-      <select id="r_cat"><option value="">请选择</option><option value="办公用品采购">办公用品采购</option><option value="家庭维修">家庭维修</option><option value="差旅报销">差旅报销</option><option value="礼金礼赠">礼金礼赠</option><option value="其他">其他</option></select>
+      <select id="r_cat"><option value="">请选择</option><option value="外出申请">1.外出申请</option><option value="爱好支出">2.爱好支出</option><option value="奢侈品支出">3.奢侈品支出</option><option value="多金支出">4.多金支出</option><option value="人情往来">5.人情往来</option><option value="家庭支出">6.家庭支出</option><option value="理财规划">7.理财规划</option></select>
     </div>
-    <div class="form-group"><label>预算金额 <span class="req">*</span></label><input type="number" id="r_budget" min="0" step="1"></div>
-    <div class="form-group"><label>执行时间 <span class="req">*</span></label><input type="date" id="r_date"></div>
-    <div class="form-group"><label>申请理由 <span class="req">*</span></label><textarea id="r_reason" rows="3"></textarea></div>
+    <div class="form-group"><label>预算金额</label><input type="number" id="r_budget" min="0" step="1"></div>
+    <div class="form-group"><label>执行时间</label><input type="date" id="r_date"></div>
+    <div class="form-group"><label>申请理由</label><textarea id="r_reason" rows="3"></textarea></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeResubmit()">取消</button>
       <button class="btn-approve" onclick="confirmResubmit()">确认提交</button>
@@ -321,11 +321,11 @@ function nowStr() { const d = new Date(); return d.getFullYear()+'/'+String(d.ge
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', chk); if (el.tagName === 'SELECT') el.addEventListener('change', chk); }
 });
-function chk() { document.getElementById('submitBtn').disabled = !(document.getElementById('f_desc').value.trim() && document.getElementById('f_cat').value && document.getElementById('f_budget').value && document.getElementById('f_date').value && document.getElementById('f_reason').value.trim()); }
+function chk() { document.getElementById('submitBtn').disabled = !(document.getElementById('f_desc').value.trim() && document.getElementById('f_cat').value); }
 
 async function submitRequest() {
   const d = document.getElementById('f_desc').value.trim(), c = document.getElementById('f_cat').value, b = document.getElementById('f_budget').value, dt = document.getElementById('f_date').value, r = document.getElementById('f_reason').value.trim();
-  if (!d || !c || !b || !dt || !r) { toast('请填写所有必填项','error'); return; }
+  if (!d || !c) { toast('请填写OA项目和项目类别','error'); return; }
   await refresh();
   const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
   try { await upsert(rec); } catch(e) { toast('保存失败','error'); return; }
@@ -376,7 +376,7 @@ function closeResubmit() { document.getElementById('resubmitModal').classList.re
 async function confirmResubmit() {
   if (!resubmitTarget) return;
   const d = document.getElementById('r_desc').value.trim(), c = document.getElementById('r_cat').value, b = document.getElementById('r_budget').value, dt = document.getElementById('r_date').value, r = document.getElementById('r_reason').value.trim();
-  if (!d || !c || !b || !dt || !r) { toast('请填写所有必填项','error'); return; }
+  if (!d || !c) { toast('请填写OA项目和项目类别','error'); return; }
   await refresh();
   const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '（重新提交，原单 '+resubmitTarget+'）' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
   try { await upsert(rec); closeResubmit(); toast('✅ 已重新提交','success'); await refresh(); } catch(e) { toast('提交失败','error'); }
