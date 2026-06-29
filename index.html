@@ -221,7 +221,7 @@ let cached = [];
 
 // ===== Supabase API（直接 fetch，不依赖任何外部 CDN）=====
 async function sbFetch(method, path, body) {
-  const opts = { method, headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=representation' } };
+  const opts = { method, headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=representation, resolution=merge-duplicates' } };
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(SB_URL + path, opts);
   const text = await r.text();
