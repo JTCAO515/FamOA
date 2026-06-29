@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>家庭OA审批管理系统</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
-/* ===== Login ===== */
 .login-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0,#764ba2 100%)}
 .login-page h1{color:#fff;font-size:28px;margin-bottom:36px;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,.2)}
 .login-cards{display:flex;gap:28px;flex-wrap:wrap;justify-content:center}
@@ -24,7 +22,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .login-card .login-btn:hover{background:#40a9ff}
 .login-card .login-btn:active{background:#096dd9}
 .login-card .err{color:#ff4d4f;font-size:12px;margin-top:8px;min-height:18px}
-/* ===== Main Layout ===== */
 .main-page{display:none;max-width:1000px;margin:0 auto;padding:20px}
 .main-page.active{display:block}
 .topbar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:14px 24px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
@@ -36,17 +33,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .topbar .badge{margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px}
 .topbar .logout-btn{padding:6px 16px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;color:#666;transition:all .2s}
 .topbar .logout-btn:hover{border-color:#ff4d4f;color:#ff4d4f}
-/* ===== Tabs ===== */
 .tabs{display:flex;gap:0;margin-bottom:0;background:#fff;border-radius:10px 10px 0 0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab{flex:1;padding:14px 20px;text-align:center;cursor:pointer;font-size:14px;color:#666;background:#fafafa;border:none;border-bottom:2px solid transparent;transition:all .2s}
 .tab:hover{background:#f0f5ff;color:#1890ff}
 .tab.active{background:#fff;color:#1890ff;border-bottom-color:#1890ff;font-weight:600}
 .tab .tab-badge{display:inline-block;background:#ff4d4f;color:#fff;font-size:11px;padding:1px 7px;border-radius:8px;margin-left:4px;vertical-align:top}
-/* ===== Tab Content ===== */
 .tab-content{background:#fff;border-radius:0 0 10px 10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);min-height:400px}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
-/* ===== Form ===== */
 .form-group{margin-bottom:16px}
 .form-group label{display:block;font-size:13px;color:#666;margin-bottom:4px;font-weight:500}
 .form-group label .req{color:#ff4d4f;margin-left:2px}
@@ -56,7 +50,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .submit-btn{width:100%;padding:11px;background:#1890ff;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;transition:all .2s;font-weight:500}
 .submit-btn:hover:not(:disabled){background:#40a9ff}
 .submit-btn:disabled{background:#d9d9d9;cursor:not-allowed;color:#999}
-/* ===== Cards ===== */
 .card{border:1px solid #e8e8e8;border-radius:8px;padding:18px;margin-bottom:14px;transition:box-shadow .2s}
 .card:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .card .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
@@ -77,12 +70,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .btn-reject:hover{background:#ff7875}
 .btn-resubmit{background:#faad14;color:#fff}
 .btn-resubmit:hover{background:#ffc53d}
-/* ===== Status Tags ===== */
 .tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:500}
 .tag-pending{background:#fff7e6;color:#d46b08;border:1px solid #ffd591}
 .tag-approved{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f}
 .tag-rejected{background:#fff1f0;color:#cf1322;border:1px solid #ffa39e}
-/* ===== Timeline ===== */
 .timeline{position:relative;padding-left:22px;margin-top:10px}
 .timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:#e8e8e8}
 .tl-item{position:relative;padding:0 0 14px 14px;font-size:13px;line-height:1.6}
@@ -96,23 +87,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .tl-item .tl-action{color:#666}
 .tl-item .tl-note{color:#666;font-style:italic;display:block;margin-top:2px;padding-left:14px;border-left:2px solid #e8e8e8}
 .tl-final{margin-top:4px;font-weight:600;font-size:13px}
-/* ===== Pagination ===== */
 .pagination{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0}
 .pagination .page-btn{padding:5px 11px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer;font-size:13px;color:#333;transition:all .2s;min-width:32px;text-align:center}
 .pagination .page-btn:hover:not(:disabled):not(.active){border-color:#1890ff;color:#1890ff}
 .pagination .page-btn.active{background:#1890ff;color:#fff;border-color:#1890ff;font-weight:500}
 .pagination .page-btn:disabled{color:#d9d9d9;cursor:not-allowed}
 .pagination .page-info{font-size:13px;color:#999;margin:0 8px}
-/* ===== Empty ===== */
 .empty{text-align:center;padding:48px 20px;color:#bbb;font-size:14px}
 .empty .icon{font-size:40px;margin-bottom:12px}
-/* ===== Toast ===== */
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:slideDown .3s;max-width:460px;text-align:center}
 .toast-success{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f}
 .toast-error{background:#fff1f0;color:#cf1322;border:1px solid #ffa39e}
 .toast-info{background:#e6f7ff;color:#096dd9;border:1px solid #91d5ff}
 @keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-/* ===== Modal ===== */
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:1000;justify-content:center;align-items:center}
 .modal-overlay.active{display:flex}
 .modal-box{background:#fff;border-radius:12px;padding:28px;width:540px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)}
@@ -122,7 +109,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .modal-box .modal-btns button{flex:1;padding:9px;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500}
 .modal-box .modal-btns .btn-cancel{background:#f5f5f5;color:#666;border:1px solid #d9d9d9}
 .modal-box .modal-btns .btn-cancel:hover{background:#e8e8e8}
-/* ===== Responsive ===== */
 @media(max-width:640px){
   .login-cards{flex-direction:column;align-items:center}
   .login-card{width:280px}
@@ -133,16 +119,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
   .topbar{padding:12px 16px;flex-wrap:wrap;gap:8px}
   .pagination{flex-wrap:wrap}
 }
-/* ===== Export ===== */
 .export-btn{padding:7px 14px;background:#fff;border:1px dashed #d9d9d9;border-radius:6px;color:#999;font-size:12px;cursor:pointer;transition:all .2s;margin-top:12px}
 .export-btn:hover{border-color:#1890ff;color:#1890ff}
+.db-error{display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:16px 20px;margin-bottom:20px;font-size:13px;line-height:1.8;max-width:560px}
+.db-error pre{background:#f5f5f5;padding:10px;border-radius:6px;margin:6px 0;font-size:12px;overflow-x:auto;text-align:left}
+.db-error a{color:#1890ff}
 </style>
 </head>
 <body>
 
 <div class="login-page" id="loginPage">
   <h1>🏠 家庭OA审批管理系统</h1>
-  <div id="dbInitMsg" style="color:#fff;font-size:13px;margin-bottom:20px;background:rgba(255,255,255,.15);padding:8px 20px;border-radius:8px;display:none"></div>
+  <div class="db-error" id="dbError">
+    <strong>⚠️ 数据库待初始化</strong>
+    <p>首次使用请前往 Supabase SQL Editor 执行以下 SQL 建表：</p>
+    <ol style="margin:6px 0 6px 18px">
+      <li>打开 <a href="https://supabase.com/dashboard" target="_blank">Supabase 控制台</a> → 登录</li>
+      <li>点击项目 <code>prgkwnzzuxirywyxkesb</code></li>
+      <li>左侧菜单 → <strong>SQL Editor</strong> → <strong>New Query</strong></li>
+      <li>粘贴以下 SQL → 点击 <strong>Run</strong></li>
+    </ol>
+    <pre>CREATE TABLE IF NOT EXISTS approvals (
+  id TEXT PRIMARY KEY,
+  data JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE approvals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_all" ON approvals;
+CREATE POLICY "allow_all" ON approvals
+  FOR ALL USING (true) WITH CHECK (true);</pre>
+    <p>运行成功后刷新此页面即可。</p>
+  </div>
   <div class="login-cards" id="loginCards"></div>
 </div>
 
@@ -155,50 +162,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
     </div>
     <button class="logout-btn" onclick="logout()">退出登录</button>
   </div>
-
-  <div class="tabs" id="tabs">
+  <div class="tabs">
     <div class="tab active" data-tab="submit" onclick="switchTab('submit')">📝 发起新申请</div>
-    <div class="tab" data-tab="approve" onclick="renderApprove()">⏳ 待我审批 <span class="tab-badge" id="approveBadge">0</span></div>
-    <div class="tab" data-tab="history" onclick="renderHistory(1)">📋 全部历史记录</div>
+    <div class="tab" data-tab="approve" onclick="switchTab('approve');renderApprove()">⏳ 待我审批 <span class="tab-badge" id="approveBadge">0</span></div>
+    <div class="tab" data-tab="history" onclick="switchTab('history');renderHistory(1)">📋 全部历史记录</div>
   </div>
-
   <div class="tab-content">
-    <!-- 发起新申请 -->
     <div class="tab-pane active" id="tab-submit">
-      <div class="form-group">
-        <label>OA需求描述 <span class="req">*</span></label>
-        <textarea id="f_desc" placeholder="请描述需要审批的事项" rows="3"></textarea>
+      <div class="form-group"><label>OA需求描述 <span class="req">*</span></label><textarea id="f_desc" placeholder="请描述需要审批的事项" rows="3"></textarea></div>
+      <div class="form-group"><label>项目类别 <span class="req">*</span></label>
+        <select id="f_cat"><option value="">请选择</option><option value="办公用品采购">办公用品采购</option><option value="家庭维修">家庭维修</option><option value="差旅报销">差旅报销</option><option value="礼金礼赠">礼金礼赠</option><option value="其他">其他</option></select>
       </div>
-      <div class="form-group">
-        <label>项目类别 <span class="req">*</span></label>
-        <select id="f_cat">
-          <option value="">请选择</option>
-          <option value="办公用品采购">办公用品采购</option>
-          <option value="家庭维修">家庭维修</option>
-          <option value="差旅报销">差旅报销</option>
-          <option value="礼金礼赠">礼金礼赠</option>
-          <option value="其他">其他</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>预算金额 <span class="req">*</span></label>
-        <input type="number" id="f_budget" placeholder="请输入金额（元）" min="0" step="1">
-      </div>
-      <div class="form-group">
-        <label>执行时间 <span class="req">*</span></label>
-        <input type="date" id="f_date">
-      </div>
-      <div class="form-group">
-        <label>申请理由 <span class="req">*</span></label>
-        <textarea id="f_reason" placeholder="请详细说明申请理由" rows="3"></textarea>
-      </div>
+      <div class="form-group"><label>预算金额 <span class="req">*</span></label><input type="number" id="f_budget" placeholder="请输入金额（元）" min="0" step="1"></div>
+      <div class="form-group"><label>执行时间 <span class="req">*</span></label><input type="date" id="f_date"></div>
+      <div class="form-group"><label>申请理由 <span class="req">*</span></label><textarea id="f_reason" placeholder="请详细说明申请理由" rows="3"></textarea></div>
       <button class="submit-btn" id="submitBtn" onclick="submitRequest()" disabled>提交申请</button>
     </div>
-
-    <!-- 待我审批 -->
     <div class="tab-pane" id="tab-approve"></div>
-
-    <!-- 全部历史记录 -->
     <div class="tab-pane" id="tab-history">
       <div id="historyList"></div>
       <div class="pagination" id="pagination"></div>
@@ -207,347 +187,182 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
   </div>
 </div>
 
-<!-- 再次提交 Modal -->
 <div class="modal-overlay" id="resubmitModal">
   <div class="modal-box">
     <h3>📄 再次提交</h3>
-    <div class="form-group">
-      <label>OA需求描述 <span class="req">*</span></label>
-      <textarea id="r_desc" rows="3"></textarea>
+    <div class="form-group"><label>OA需求描述 <span class="req">*</span></label><textarea id="r_desc" rows="3"></textarea></div>
+    <div class="form-group"><label>项目类别 <span class="req">*</span></label>
+      <select id="r_cat"><option value="">请选择</option><option value="办公用品采购">办公用品采购</option><option value="家庭维修">家庭维修</option><option value="差旅报销">差旅报销</option><option value="礼金礼赠">礼金礼赠</option><option value="其他">其他</option></select>
     </div>
-    <div class="form-group">
-      <label>项目类别 <span class="req">*</span></label>
-      <select id="r_cat">
-        <option value="">请选择</option>
-        <option value="办公用品采购">办公用品采购</option>
-        <option value="家庭维修">家庭维修</option>
-        <option value="差旅报销">差旅报销</option>
-        <option value="礼金礼赠">礼金礼赠</option>
-        <option value="其他">其他</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>预算金额 <span class="req">*</span></label>
-      <input type="number" id="r_budget" min="0" step="1">
-    </div>
-    <div class="form-group">
-      <label>执行时间 <span class="req">*</span></label>
-      <input type="date" id="r_date">
-    </div>
-    <div class="form-group">
-      <label>申请理由 <span class="req">*</span></label>
-      <textarea id="r_reason" rows="3"></textarea>
-    </div>
+    <div class="form-group"><label>预算金额 <span class="req">*</span></label><input type="number" id="r_budget" min="0" step="1"></div>
+    <div class="form-group"><label>执行时间 <span class="req">*</span></label><input type="date" id="r_date"></div>
+    <div class="form-group"><label>申请理由 <span class="req">*</span></label><textarea id="r_reason" rows="3"></textarea></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeResubmit()">取消</button>
-      <button class="btn-approve" id="resubmitConfirmBtn" onclick="confirmResubmit()">确认提交</button>
+      <button class="btn-approve" onclick="confirmResubmit()">确认提交</button>
     </div>
   </div>
 </div>
 
 <script>
-// ===== Configuration =====
+// ===== 配置 =====
 const USERS = {
   admin1: { name: 'ViVi', password: '19980515' },
   admin2: { name: 'JT', password: '19980131' }
 };
 const PER_PAGE = 10;
-const SUPABASE_URL = 'https://prgkwnzzuxirywyxkesb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbG...e4EI';
+const SB_URL = 'https://prgkwnzzuxirywyxkesb.supabase.co';
+const SB_KEY = 'eyJhbG...e4EI';
 
-// ===== Supabase =====
-const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ===== State =====
+// ===== 状态 =====
 let currentUser = null;
 let resubmitTarget = null;
-let cachedApprovals = []; // local cache for fast rendering
+let cached = [];
 
-// ===== Data API (all async via Supabase) =====
-async function loadApprovals() {
-  const { data, error } = await supabase
-    .from('approvals')
-    .select('data')
-    .order('data->>createdAt', { ascending: false });
-  if (error) {
-    console.error('Supabase load error:', error);
-    if (error.code === 'PGRST205' || error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('42P01')) {
-      showDbInitError();
-    }
-    return [];
-  }
-  return (data || []).map(r => r.data);
+// ===== Supabase API（直接 fetch，不依赖任何外部 CDN）=====
+async function sbFetch(method, path, body) {
+  const opts = { method, headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=representation' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(SB_URL + path, opts);
+  const text = await r.text();
+  if (!r.ok) throw { code: r.status, msg: text, isTableMissing: text.includes('PGRST205') || text.includes('does not exist') || text.includes('42P01') };
+  try { return JSON.parse(text); } catch(e) { return text; }
 }
 
-async function saveApproval(record) {
-  const { data, error } = await supabase
-    .from('approvals')
-    .upsert({ id: record.id, data: record }, { onConflict: 'id' })
-    .select();
-  if (error) {
-    console.error('Supabase save error:', error);
-    toast('保存失败：' + error.message, 'error');
-    return false;
-  }
-  return true;
+async function loadAll() {
+  const raw = await sbFetch('GET', '/rest/v1/approvals?order=data->>createdAt.desc.nullslast&select=data');
+  return (raw || []).map(r => r.data);
 }
 
-async function deleteApproval(id) {
-  const { data, error } = await supabase
-    .from('approvals')
-    .delete()
-    .eq('id', id);
-  if (error) {
-    console.error('Supabase delete error:', error);
-    return false;
-  }
-  return true;
+async function upsert(record) {
+  await sbFetch('POST', '/rest/v1/approvals', { id: record.id, data: record });
 }
 
-function showDbInitError() {
-  const msg = document.getElementById('dbInitMsg');
-  msg.style.display = 'block';
-  msg.innerHTML = '⚠️ 数据库表尚未创建。<br>请前往 Supabase SQL Editor 执行初始化代码（见页面最底部提示）。';
-}
-
-// ===== Refresh & Cache =====
-async function refreshCache() {
-  cachedApprovals = await loadApprovals();
-  return cachedApprovals;
-}
-
-// ===== Init =====
+// ===== 初始化 =====
 async function init() {
-  renderLoginCards();
-  // Try to load data to verify table exists
-  const { error } = await supabase.from('approvals').select('id').limit(1);
-  if (error && (error.code === 'PGRST205' || error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('42P01'))) {
-    showDbInitError();
+  renderLogin();
+  // 检查数据库连通性
+  try {
+    await sbFetch('GET', '/rest/v1/approvals?limit=1&select=id');
+  } catch(e) {
+    if (e.isTableMissing) {
+      document.getElementById('dbError').style.display = 'block';
+    }
   }
-  const saved = localStorage.getItem('oa_current_user');
-  if (saved && USERS[saved]) {
-    currentUser = saved;
-    enterMain();
-  }
+  const saved = localStorage.getItem('oa_cur');
+  if (saved && USERS[saved]) { currentUser = saved; enterMain(); }
 }
 
-// ===== Login =====
-function renderLoginCards() {
+function renderLogin() {
   const c = document.getElementById('loginCards');
-  c.innerHTML = '';
-  const colors = { admin1: 'a1', admin2: 'a2' };
-  Object.keys(USERS).forEach(key => {
-    const u = USERS[key];
-    const card = document.createElement('div');
-    card.className = 'login-card';
-    card.innerHTML = `
-      <div class="avatar ${colors[key]}">👤</div>
+  const c2 = { admin1:'a1', admin2:'a2' };
+  c.innerHTML = Object.keys(USERS).map(k => {
+    const u = USERS[k];
+    return `<div class="login-card">
+      <div class="avatar ${c2[k]}">👤</div>
       <h3>${u.name}</h3>
-      <input type="password" id="pw_${key}" placeholder="输入密码" onkeydown="if(event.key==='Enter')login('${key}')">
-      <button class="login-btn" onclick="login('${key}')">登 录</button>
-      <div class="err" id="err_${key}"></div>
-    `;
-    c.appendChild(card);
-  });
+      <input type="password" id="pw_${k}" placeholder="输入密码" onkeydown="if(event.key==='Enter')login('${k}')">
+      <button class="login-btn" onclick="login('${k}')">登 录</button>
+      <div class="err" id="err_${k}"></div>
+    </div>`;
+  }).join('');
 }
 
-function login(key) {
-  const pw = document.getElementById('pw_' + key).value;
-  const err = document.getElementById('err_' + key);
-  if (pw === USERS[key].password) {
-    currentUser = key;
-    localStorage.setItem('oa_current_user', key);
-    err.textContent = '';
-    enterMain();
-  } else {
-    err.textContent = '❌ 密码错误';
-  }
+function login(k) {
+  const v = document.getElementById('pw_' + k).value;
+  const e = document.getElementById('err_' + k);
+  if (v === USERS[k].password) { currentUser = k; localStorage.setItem('oa_cur', k); e.textContent = ''; enterMain(); }
+  else { e.textContent = '❌ 密码错误'; }
 }
 
-// ===== Main =====
 async function enterMain() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('mainPage').classList.add('active');
-  const u = USERS[currentUser];
-  document.getElementById('userName').textContent = u.name;
-  const dot = document.getElementById('userDot');
-  dot.className = 'dot ' + (currentUser === 'admin1' ? 'a1' : 'a2');
+  document.getElementById('userName').textContent = USERS[currentUser].name;
+  document.getElementById('userDot').className = 'dot ' + (currentUser === 'admin1' ? 'a1' : 'a2');
   switchTab('submit');
-  await refreshUI();
+  await refresh();
 }
 
 function logout() {
-  currentUser = null;
-  localStorage.removeItem('oa_current_user');
+  currentUser = null; localStorage.removeItem('oa_cur');
   document.getElementById('mainPage').classList.remove('active');
   document.getElementById('loginPage').style.display = 'flex';
-  document.querySelectorAll('.login-card input[type="password"]').forEach(el => el.value = '');
+  document.querySelectorAll('.login-card input').forEach(el => el.value = '');
   document.querySelectorAll('.login-card .err').forEach(el => el.textContent = '');
 }
 
-// ===== Tab =====
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
-}
-
-// ===== Refresh UI =====
-async function refreshUI() {
-  await refreshCache();
+// ===== 刷新 =====
+async function refresh() {
+  try { cached = await loadAll(); } catch(e) { console.error(e); }
   updateBadge();
-  renderApprove();
-  renderHistory(1);
-  checkFormValid();
 }
 
 function updateBadge() {
-  const pending = cachedApprovals.filter(a =>
-    a.status === 'pending' &&
-    a.creator !== currentUser &&
-    !a.approvedBy.includes(currentUser)
-  ).length;
-  const badge = document.getElementById('pendingBadge');
-  if (pending > 0) {
-    badge.textContent = pending;
-    badge.style.display = 'inline-block';
-  } else {
-    badge.style.display = 'none';
-  }
-  document.getElementById('approveBadge').textContent = pending;
+  const n = cached.filter(a => a.status === 'pending' && a.creator !== currentUser && !a.approvedBy.includes(currentUser)).length;
+  const b = document.getElementById('pendingBadge');
+  if (n > 0) { b.textContent = n; b.style.display = 'inline-block'; } else { b.style.display = 'none'; }
+  document.getElementById('approveBadge').textContent = n;
 }
 
-function generateId() {
-  const now = new Date();
-  const ds = now.getFullYear() +
-    String(now.getMonth() + 1).padStart(2, '0') +
-    String(now.getDate()).padStart(2, '0');
-  const today = cachedApprovals.filter(a => a.id.startsWith('OA-' + ds + '-'));
-  const seq = String(today.length + 1).padStart(3, '0');
-  return 'OA-' + ds + '-' + seq;
+function switchTab(n) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === n));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + n));
 }
 
-function nowStr() {
-  const d = new Date();
-  return d.getFullYear() + '/' +
-    String(d.getMonth() + 1).padStart(2, '0') + '/' +
-    String(d.getDate()).padStart(2, '0') + ' ' +
-    String(d.getHours()).padStart(2, '0') + ':' +
-    String(d.getMinutes()).padStart(2, '0') + ':' +
-    String(d.getSeconds()).padStart(2, '0');
+function genId() {
+  const d = new Date(); const ds = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  return 'OA-' + ds + '-' + String(cached.filter(a => a.id.startsWith('OA-' + ds + '-')).length + 1).padStart(3,'0');
 }
+function nowStr() { const d = new Date(); return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0'); }
 
-// ===== Submit =====
-function checkFormValid() {
-  const desc = document.getElementById('f_desc').value.trim();
-  const cat = document.getElementById('f_cat').value;
-  const budget = document.getElementById('f_budget').value;
-  const date = document.getElementById('f_date').value;
-  const reason = document.getElementById('f_reason').value.trim();
-  document.getElementById('submitBtn').disabled = !(desc && cat && budget && date && reason);
-}
+// ===== 提交 =====
 ['f_desc','f_cat','f_budget','f_date','f_reason'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) { el.addEventListener('input', checkFormValid); if (el.tagName === 'SELECT') el.addEventListener('change', checkFormValid); }
+  if (el) { el.addEventListener('input', chk); if (el.tagName === 'SELECT') el.addEventListener('change', chk); }
 });
+function chk() { document.getElementById('submitBtn').disabled = !(document.getElementById('f_desc').value.trim() && document.getElementById('f_cat').value && document.getElementById('f_budget').value && document.getElementById('f_date').value && document.getElementById('f_reason').value.trim()); }
 
 async function submitRequest() {
-  const desc = document.getElementById('f_desc').value.trim();
-  const cat = document.getElementById('f_cat').value;
-  const budget = document.getElementById('f_budget').value;
-  const date = document.getElementById('f_date').value;
-  const reason = document.getElementById('f_reason').value.trim();
-  if (!desc || !cat || !budget || !date || !reason) {
-    toast('请填写所有必填项', 'error');
-    return;
-  }
-  await refreshCache();
-  const record = {
-    id: generateId(),
-    creator: currentUser,
-    creatorName: USERS[currentUser].name,
-    description: desc,
-    category: cat,
-    budget: Number(budget),
-    executeDate: date,
-    reason: reason,
-    status: 'pending',
-    timeline: [{
-      type: 'submit',
-      operator: currentUser,
-      operatorName: USERS[currentUser].name,
-      time: nowStr(),
-      note: ''
-    }],
-    approvedBy: [],
-    rejectedBy: [],
-    createdAt: nowStr()
-  };
-  const ok = await saveApproval(record);
-  if (!ok) return;
-  document.getElementById('f_desc').value = '';
-  document.getElementById('f_cat').value = '';
-  document.getElementById('f_budget').value = '';
-  document.getElementById('f_date').value = '';
-  document.getElementById('f_reason').value = '';
-  checkFormValid();
-  toast('✅ 提交成功，等待另一位管理员审批', 'success');
-  await refreshUI();
+  const d = document.getElementById('f_desc').value.trim(), c = document.getElementById('f_cat').value, b = document.getElementById('f_budget').value, dt = document.getElementById('f_date').value, r = document.getElementById('f_reason').value.trim();
+  if (!d || !c || !b || !dt || !r) { toast('请填写所有必填项','error'); return; }
+  await refresh();
+  const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
+  try { await upsert(rec); } catch(e) { toast('保存失败','error'); return; }
+  for (const id of ['f_desc','f_cat','f_budget','f_date','f_reason']) document.getElementById(id).value = '';
+  chk(); toast('✅ 提交成功，等待另一位管理员审批','success'); await refresh();
 }
 
-// ===== Approve / Reject =====
+// ===== 审批 =====
 async function approveItem(id) {
-  const note = (document.getElementById('note_' + id)?.value || '').trim();
-  await refreshCache();
-  const rec = cachedApprovals.find(a => a.id === id);
+  const note = (document.getElementById('note_'+id)?.value||'').trim();
+  await refresh();
+  const rec = cached.find(a => a.id === id);
   if (!rec || rec.status !== 'pending') return;
-  if (rec.creator === currentUser) { toast('不能审批自己的申请', 'error'); return; }
-  if (rec.approvedBy.includes(currentUser)) { toast('已审批过此单据', 'info'); return; }
-
+  if (rec.creator === currentUser) { toast('不能审批自己的申请','error'); return; }
+  if (rec.approvedBy.includes(currentUser)) { toast('已审批过','info'); return; }
   rec.approvedBy.push(currentUser);
-  rec.timeline.push({
-    type: 'approve',
-    operator: currentUser,
-    operatorName: USERS[currentUser].name,
-    time: nowStr(),
-    note: note
-  });
-
-  const otherAccounts = Object.keys(USERS).filter(k => k !== rec.creator);
-  if (otherAccounts.every(acc => rec.approvedBy.includes(acc))) {
-    rec.status = 'approved';
-  }
-
-  await saveApproval(rec);
-  toast('✅ 已同意', 'success');
-  await refreshUI();
+  rec.timeline.push({ type:'approve', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note });
+  if (Object.keys(USERS).filter(k => k !== rec.creator).every(a => rec.approvedBy.includes(a))) rec.status = 'approved';
+  try { await upsert(rec); toast('✅ 已同意','success'); await refresh(); renderApprove(); } catch(e) { toast('操作失败','error'); }
 }
 
 async function rejectItem(id) {
-  const note = (document.getElementById('note_' + id)?.value || '').trim();
-  if (!note) { toast('请填写驳回理由', 'error'); return; }
-  await refreshCache();
-  const rec = cachedApprovals.find(a => a.id === id);
+  const note = (document.getElementById('note_'+id)?.value||'').trim();
+  if (!note) { toast('请填写驳回理由','error'); return; }
+  await refresh();
+  const rec = cached.find(a => a.id === id);
   if (!rec || rec.status !== 'pending') return;
-  if (rec.creator === currentUser) { toast('不能驳回自己的申请', 'error'); return; }
-
+  if (rec.creator === currentUser) { toast('不能驳回自己的申请','error'); return; }
   rec.status = 'rejected';
   rec.rejectedBy.push(currentUser);
-  rec.timeline.push({
-    type: 'reject',
-    operator: currentUser,
-    operatorName: USERS[currentUser].name,
-    time: nowStr(),
-    note: note
-  });
-
-  await saveApproval(rec);
-  toast('⛔ 已驳回', 'info');
-  await refreshUI();
+  rec.timeline.push({ type:'reject', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note });
+  try { await upsert(rec); toast('⛔ 已驳回','info'); await refresh(); renderApprove(); } catch(e) { toast('操作失败','error'); }
 }
 
-// ===== Resubmit =====
+// ===== 再次提交 =====
 function openResubmit(id) {
-  const rec = cachedApprovals.find(a => a.id === id);
+  const rec = cached.find(a => a.id === id);
   if (!rec || rec.creator !== currentUser || rec.status !== 'rejected') return;
   resubmitTarget = id;
   document.getElementById('r_desc').value = rec.description;
@@ -557,224 +372,68 @@ function openResubmit(id) {
   document.getElementById('r_reason').value = rec.reason;
   document.getElementById('resubmitModal').classList.add('active');
 }
-
-function closeResubmit() {
-  document.getElementById('resubmitModal').classList.remove('active');
-  resubmitTarget = null;
-}
-
+function closeResubmit() { document.getElementById('resubmitModal').classList.remove('active'); resubmitTarget = null; }
 async function confirmResubmit() {
   if (!resubmitTarget) return;
-  const desc = document.getElementById('r_desc').value.trim();
-  const cat = document.getElementById('r_cat').value;
-  const budget = document.getElementById('r_budget').value;
-  const date = document.getElementById('r_date').value;
-  const reason = document.getElementById('r_reason').value.trim();
-  if (!desc || !cat || !budget || !date || !reason) {
-    toast('请填写所有必填项', 'error');
-    return;
-  }
-  await refreshCache();
-  const record = {
-    id: generateId(),
-    creator: currentUser,
-    creatorName: USERS[currentUser].name,
-    description: desc,
-    category: cat,
-    budget: Number(budget),
-    executeDate: date,
-    reason: reason,
-    status: 'pending',
-    timeline: [{
-      type: 'submit',
-      operator: currentUser,
-      operatorName: USERS[currentUser].name,
-      time: nowStr(),
-      note: '（重新提交，原单 ' + resubmitTarget + '）'
-    }],
-    approvedBy: [],
-    rejectedBy: [],
-    createdAt: nowStr()
-  };
-  const ok = await saveApproval(record);
-  if (!ok) return;
-  closeResubmit();
-  toast('✅ 已重新提交，等待另一位管理员审批', 'success');
-  await refreshUI();
+  const d = document.getElementById('r_desc').value.trim(), c = document.getElementById('r_cat').value, b = document.getElementById('r_budget').value, dt = document.getElementById('r_date').value, r = document.getElementById('r_reason').value.trim();
+  if (!d || !c || !b || !dt || !r) { toast('请填写所有必填项','error'); return; }
+  await refresh();
+  const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '（重新提交，原单 '+resubmitTarget+'）' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
+  try { await upsert(rec); closeResubmit(); toast('✅ 已重新提交','success'); await refresh(); } catch(e) { toast('提交失败','error'); }
 }
 
-// ===== Render Approve =====
+// ===== 渲染 =====
 function renderApprove() {
   const el = document.getElementById('tab-approve');
-  // Switch tab visually
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'approve'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-approve'));
-
-  const pending = cachedApprovals.filter(a =>
-    a.status === 'pending' &&
-    a.creator !== currentUser &&
-    !a.approvedBy.includes(currentUser)
-  );
-  if (pending.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="icon">✅</div>暂无待审批的单据</div>';
-    return;
-  }
-  el.innerHTML = pending.map(r => renderCard(r, true)).join('');
+  const list = cached.filter(a => a.status === 'pending' && a.creator !== currentUser && !a.approvedBy.includes(currentUser));
+  if (list.length === 0) { el.innerHTML = '<div class="empty"><div class="icon">✅</div>暂无待审批的单据</div>'; return; }
+  el.innerHTML = list.map(r => card(r, true)).join('');
 }
 
-// ===== Render Card =====
-function renderCard(r, showActions) {
-  const statusMap = {
-    pending: '<span class="tag tag-pending">⏳ 待审批</span>',
-    approved: '<span class="tag tag-approved">✅ 全部通过</span>',
-    rejected: '<span class="tag tag-rejected">⛔ 已驳回</span>'
-  };
-  const budgetStr = '¥ ' + Number(r.budget).toLocaleString();
-  let actions = '';
-  if (showActions && r.status === 'pending' && r.creator !== currentUser && !r.approvedBy.includes(currentUser)) {
-    actions = `
-      <div class="card-actions">
-        <textarea id="note_${r.id}" placeholder="填写附注（驳回必须填写理由）" rows="2"></textarea>
-        <div class="action-btns">
-          <button class="btn-approve" onclick="approveItem('${r.id}')">✅ 同意</button>
-          <button class="btn-reject" onclick="rejectItem('${r.id}')">⛔ 拒绝</button>
-        </div>
-      </div>`;
-  }
-  if (r.status === 'rejected' && r.creator === currentUser) {
-    actions = `
-      <div class="card-actions">
-        <div class="action-btns">
-          <button class="btn-resubmit" onclick="openResubmit('${r.id}')">🔄 再次提交</button>
-        </div>
-      </div>`;
-  }
+function card(r, act) {
+  const s = { pending:'<span class="tag tag-pending">⏳ 待审批</span>', approved:'<span class="tag tag-approved">✅ 全部通过</span>', rejected:'<span class="tag tag-rejected">⛔ 已驳回</span>' };
+  const tl = r.timeline.map(t => `<div class="tl-item tl-${t.type}"><span class="tl-time">[${t.time}]</span> <span class="tl-op">${t.operatorName}</span> <span class="tl-action">→ ${t.type === 'submit' ? '📋 发起申请' : t.type === 'approve' ? '✅ 同意' : '⛔ 拒绝'}</span>${t.note ? '<span class="tl-note">附注：'+h(t.note)+'</span>' : ''}</div>`).join('');
+  const fin = r.status === 'approved' ? '<div class="tl-final" style="color:#52c41a">✅ 最终状态：全部通过 ✓</div>' : r.status === 'rejected' ? '<div class="tl-final" style="color:#ff4d4f">⛔ 最终状态：已驳回 ✗</div>' : '<div class="tl-final" style="color:#faad14">⏳ 最终状态：待审批</div>';
+  let ac = '';
+  if (act && r.status === 'pending' && r.creator !== currentUser && !r.approvedBy.includes(currentUser))
+    ac = `<div class="card-actions"><textarea id="note_${r.id}" placeholder="填写附注（驳回必须填写理由）" rows="2"></textarea><div class="action-btns"><button class="btn-approve" onclick="approveItem('${r.id}')">✅ 同意</button><button class="btn-reject" onclick="rejectItem('${r.id}')">⛔ 拒绝</button></div></div>`;
+  if (r.status === 'rejected' && r.creator === currentUser)
+    ac = `<div class="card-actions"><div class="action-btns"><button class="btn-resubmit" onclick="openResubmit('${r.id}')">🔄 再次提交</button></div></div>`;
+  return `<div class="card"><div class="card-header"><span class="id">#${r.id}</span><div><span class="creator">发起人：${r.creatorName} · ${r.createdAt}</span> ${s[r.status]}</div></div><div class="card-body"><div class="row"><span class="label">需求描述</span><span class="val">${h(r.description)}</span></div><div class="row"><span class="label">项目类别</span><span class="val">${r.category}</span></div><div class="row"><span class="label">预算金额</span><span class="val">¥ ${Number(r.budget).toLocaleString()}</span></div><div class="row"><span class="label">执行时间</span><span class="val">${r.executeDate}</span></div><div class="row"><span class="label">申请理由</span><span class="val">${h(r.reason)}</span></div></div><div class="timeline">${tl}${fin}</div>${ac}</div>`;
+}
+function h(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-  const timelineHtml = r.timeline.map(t => {
-    const cls = 'tl-item tl-' + t.type;
-    const actionLabel = t.type === 'submit' ? '📋 发起申请' : (t.type === 'approve' ? '✅ 同意' : '⛔ 拒绝');
-    return `<div class="${cls}">
-      <span class="tl-time">[${t.time}]</span>
-      <span class="tl-op">${t.operatorName}</span>
-      <span class="tl-action">→ ${actionLabel}</span>
-      ${t.note ? '<span class="tl-note">附注：' + escHtml(t.note) + '</span>' : ''}
-    </div>`;
-  }).join('');
-
-  const finalLine = r.status === 'approved' ? '<div class="tl-final" style="color:#52c41a">✅ 最终状态：全部通过 ✓</div>' :
-    (r.status === 'rejected' ? '<div class="tl-final" style="color:#ff4d4f">⛔ 最终状态：已驳回 ✗</div>' :
-    '<div class="tl-final" style="color:#faad14">⏳ 最终状态：待审批</div>');
-
-  return `<div class="card">
-    <div class="card-header">
-      <span class="id">#${r.id}</span>
-      <div><span class="creator">发起人：${r.creatorName} · ${r.createdAt}</span> ${statusMap[r.status]}</div>
-    </div>
-    <div class="card-body">
-      <div class="row"><span class="label">需求描述</span><span class="val">${escHtml(r.description)}</span></div>
-      <div class="row"><span class="label">项目类别</span><span class="val">${r.category}</span></div>
-      <div class="row"><span class="label">预算金额</span><span class="val">${budgetStr}</span></div>
-      <div class="row"><span class="label">执行时间</span><span class="val">${r.executeDate}</span></div>
-      <div class="row"><span class="label">申请理由</span><span class="val">${escHtml(r.reason)}</span></div>
-    </div>
-    <div class="timeline">${timelineHtml}${finalLine}</div>
-    ${actions}
-  </div>`;
+// ===== 历史 =====
+function renderHistory(pg) {
+  const el = document.getElementById('historyList'), pgEl = document.getElementById('pagination');
+  if (cached.length === 0) { el.innerHTML = '<div class="empty"><div class="icon">📋</div>暂无审批记录</div>'; pgEl.innerHTML = ''; return; }
+  const tp = Math.ceil(cached.length / PER_PAGE), p = Math.min(Math.max(1, pg), tp), st = (p-1)*PER_PAGE;
+  el.innerHTML = cached.slice(st, st+PER_PAGE).map(r => card(r, false)).join('');
+  let h = `<button class="page-btn" onclick="renderHistory(${p-1})" ${p<=1?'disabled':''}>‹</button>`;
+  let ps = Math.max(1, p-4), pe = Math.min(tp, ps+9);
+  if (pe-ps+1 < 10) ps = Math.max(1, pe-9);
+  for (let i = ps; i <= pe; i++) h += `<button class="page-btn ${i===p?'active':''}" onclick="renderHistory(${i})">${i}</button>`;
+  h += `<button class="page-btn" onclick="renderHistory(${p+1})" ${p>=tp?'disabled':''}>›</button><span class="page-info">第 ${p}/${tp} 页，共 ${cached.length} 条</span>`;
+  pgEl.innerHTML = h;
 }
 
-function escHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-
-// ===== History =====
-let historyPage = 1;
-function renderHistory(page) {
-  historyPage = page;
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'history'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-history'));
-
-  const el = document.getElementById('historyList');
-  const pagination = document.getElementById('pagination');
-  const approvals = [...cachedApprovals]; // already sorted newest first from loadApprovals
-
-  if (approvals.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="icon">📋</div>暂无审批记录</div>';
-    pagination.innerHTML = '';
-    return;
-  }
-
-  const total = approvals.length;
-  const totalPages = Math.ceil(total / PER_PAGE);
-  const p = Math.min(Math.max(1, page), totalPages);
-  const start = (p - 1) * PER_PAGE;
-  const pageData = approvals.slice(start, start + PER_PAGE);
-  el.innerHTML = pageData.map(r => renderCard(r, false)).join('');
-
-  let phtml = '';
-  phtml += `<button class="page-btn" onclick="renderHistory(${p - 1})" ${p <= 1 ? 'disabled' : ''}>‹</button>`;
-  const maxPages = Math.min(totalPages, 10);
-  let ps = Math.max(1, p - 4);
-  let pe = Math.min(totalPages, ps + maxPages - 1);
-  if (pe - ps + 1 < maxPages) ps = Math.max(1, pe - maxPages + 1);
-  for (let i = ps; i <= pe; i++) {
-    phtml += `<button class="page-btn ${i === p ? 'active' : ''}" onclick="renderHistory(${i})">${i}</button>`;
-  }
-  phtml += `<button class="page-btn" onclick="renderHistory(${p + 1})" ${p >= totalPages ? 'disabled' : ''}>›</button>`;
-  phtml += `<span class="page-info">第 ${p}/${totalPages} 页，共 ${total} 条</span>`;
-  pagination.innerHTML = phtml;
-}
-
-// ===== Export =====
+// ===== 导出 =====
 async function exportData() {
-  const data = await loadApprovals();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'OA审批记录_' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast('📥 导出成功', 'success');
+  try {
+    const d = await loadAll();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
+    a.download = 'OA审批记录_'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href);
+    toast('📥 导出成功','success');
+  } catch(e) { toast('导出失败','error'); }
 }
 
-// ===== Toast =====
-function toast(msg, type) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const el = document.createElement('div');
-  el.className = 'toast toast-' + type;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2500);
+function toast(msg, t) {
+  const old = document.querySelector('.toast'); if (old) old.remove();
+  const el = document.createElement('div'); el.className = 'toast toast-'+t; el.textContent = msg;
+  document.body.appendChild(el); setTimeout(() => el.remove(), 2500);
 }
 
-// ===== Boot =====
 init();
 </script>
-<div style="display:none;padding:20px;max-width:1000px;margin:20px auto;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;font-size:13px;line-height:1.8" id="sqlGuide">
-  <strong>🔧 数据库初始化</strong>
-  <p style="margin-top:8px">首次使用需要建表，请按以下步骤操作：</p>
-  <ol style="margin:8px 0 0 20px">
-    <li>打开 <a href="https://supabase.com/dashboard" target="_blank" style="color:#1890ff">Supabase 控制台</a> → 登录 → 点击项目 prgkwnzzuxirywyxkesb</li>
-    <li>左侧菜单点击 <strong>SQL Editor</strong></li>
-    <li>点击 <strong>New Query</strong>（新建查询）</li>
-    <li>复制下面的 SQL，粘贴进去，点击 <strong>Run</strong>（运行）</li>
-  </ol>
-  <pre style="background:#f5f5f5;padding:12px;border-radius:6px;margin:8px 0;overflow-x:auto;font-size:12px">
-CREATE TABLE IF NOT EXISTS approvals (
-  id TEXT PRIMARY KEY,
-  data JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE approvals ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "allow_all" ON approvals;
-CREATE POLICY "allow_all" ON approvals
-  FOR ALL USING (true) WITH CHECK (true);
-  </pre>
-  <p style="color:#666">运行成功后刷新页面即可使用。</p>
-</div>
 </body>
 </html>
