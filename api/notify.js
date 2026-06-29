@@ -3,7 +3,7 @@
 
 const SENDKEYS = {
   // JT 提交时 → 通知 ViVi（填 ViVi 的 Key）
-  admin2: '',
+  admin2: 'SCT372167TzXaXzYFZ5Kt0gR0mTzbywSWU',
   // ViVi 提交时 → 通知 JT（填 JT 的 Key）
   admin1: 'SCT372166T7GR4ZXZrVPi2XwNtWTpCBHEc'
 };
