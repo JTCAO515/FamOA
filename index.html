@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>金斤微-家庭申请审批管理系统</title>
+<title>金斤微OA审批</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
@@ -129,7 +129,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 <body>
 
 <div class="login-page" id="loginPage">
-  <h1>🏠 金斤微-家庭申请审批管理系统</h1>
+  <h1>🏠 金斤微OA审批</h1>
   <div class="db-error" id="dbError">
     <strong>⚠️ 数据库待初始化</strong>
     <p>首次使用请前往 Supabase SQL Editor 执行以下 SQL 建表：</p>
@@ -329,6 +329,21 @@ async function submitRequest() {
   await refresh();
   const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
   try { await upsert(rec); } catch(e) { toast('保存失败','error'); return; }
+  // 推送通知
+  try {
+    await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        submitter: currentUser,
+        submitterName: USERS[currentUser].name,
+        description: d,
+        category: c,
+        budget: b,
+        id: rec.id
+      })
+    });
+  } catch(e) { /* 推送失败不影响主流程 */ }
   for (const id of ['f_desc','f_cat','f_budget','f_date','f_reason']) document.getElementById(id).value = '';
   chk(); toast('✅ 提交成功，等待另一位管理员审批','success'); await refresh();
 }
