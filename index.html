@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家庭OA审批管理系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
+/* ===== Login ===== */
+.login-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0,#764ba2 100%)}
+.login-page h1{color:#fff;font-size:28px;margin-bottom:36px;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,.2)}
+.login-cards{display:flex;gap:28px;flex-wrap:wrap;justify-content:center}
+.login-card{background:#fff;border-radius:12px;padding:32px 28px;width:260px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.15);transition:transform .2s}
+.login-card:hover{transform:translateY(-4px)}
+.login-card .avatar{width:64px;height:64px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;font-weight:700}
+.login-card .avatar.a1{background:#1890ff}
+.login-card .avatar.a2{background:#52c41a}
+.login-card h3{font-size:16px;margin-bottom:16px;color:#333}
+.login-card input{width:100%;padding:10px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;outline:none;transition:border .2s;margin-bottom:12px}
+.login-card input:focus{border-color:#1890ff;box-shadow:0 0 0 2px rgba(24,144,255,.2)}
+.login-card .login-btn{width:100%;padding:10px;background:#1890ff;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;transition:background .2s}
+.login-card .login-btn:hover{background:#40a9ff}
+.login-card .login-btn:active{background:#096dd9}
+.login-card .err{color:#ff4d4f;font-size:12px;margin-top:8px;min-height:18px}
+/* ===== Main Layout ===== */
+.main-page{display:none;max-width:1000px;margin:0 auto;padding:20px}
+.main-page.active{display:block}
+.topbar{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:14px 24px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px}
+.topbar .user-info{display:flex;align-items:center;gap:10px}
+.topbar .user-info .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.topbar .user-info .dot.a1{background:#1890ff}
+.topbar .user-info .dot.a2{background:#52c41a}
+.topbar .user-info .name{font-weight:600;font-size:15px}
+.topbar .badge{margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px}
+.topbar .logout-btn{padding:6px 16px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;color:#666;transition:all .2s}
+.topbar .logout-btn:hover{border-color:#ff4d4f;color:#ff4d4f}
+/* ===== Tabs ===== */
+.tabs{display:flex;gap:0;margin-bottom:0;background:#fff;border-radius:10px 10px 0 0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tab{flex:1;padding:14px 20px;text-align:center;cursor:pointer;font-size:14px;color:#666;background:#fafafa;border:none;border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{background:#f0f5ff;color:#1890ff}
+.tab.active{background:#fff;color:#1890ff;border-bottom-color:#1890ff;font-weight:600}
+.tab .tab-badge{display:inline-block;background:#ff4d4f;color:#fff;font-size:11px;padding:1px 7px;border-radius:8px;margin-left:4px;vertical-align:top}
+/* ===== Tab Content ===== */
+.tab-content{background:#fff;border-radius:0 0 10px 10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08);min-height:400px}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+/* ===== Form ===== */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:#666;margin-bottom:4px;font-weight:500}
+.form-group label .req{color:#ff4d4f;margin-left:2px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 11px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;outline:none;transition:border .2s;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#1890ff;box-shadow:0 0 0 2px rgba(24,144,255,.2)}
+.form-group textarea{resize:vertical;min-height:72px}
+.submit-btn{width:100%;padding:11px;background:#1890ff;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;transition:all .2s;font-weight:500}
+.submit-btn:hover:not(:disabled){background:#40a9ff}
+.submit-btn:disabled{background:#d9d9d9;cursor:not-allowed;color:#999}
+/* ===== Cards ===== */
+.card{border:1px solid #e8e8e8;border-radius:8px;padding:18px;margin-bottom:14px;transition:box-shadow .2s}
+.card:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.card .card-header .id{font-weight:600;font-size:14px;color:#1890ff}
+.card .card-header .creator{font-size:12px;color:#999}
+.card .card-body{font-size:13px;line-height:1.7}
+.card .card-body .row{display:flex;margin-bottom:4px}
+.card .card-body .row .label{color:#999;width:80px;flex-shrink:0}
+.card .card-body .row .val{color:#333;flex:1}
+.card .card-actions{margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0}
+.card .card-actions textarea{width:100%;padding:8px 10px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;outline:none;transition:border .2s;resize:vertical;min-height:48px;font-family:inherit;margin-bottom:8px}
+.card .card-actions textarea:focus{border-color:#1890ff;box-shadow:0 0 0 2px rgba(24,144,255,.2)}
+.card .action-btns{display:flex;gap:10px}
+.card .action-btns button{flex:1;padding:8px;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s;font-weight:500}
+.btn-approve{background:#52c41a;color:#fff}
+.btn-approve:hover{background:#73d13d}
+.btn-reject{background:#ff4d4f;color:#fff}
+.btn-reject:hover{background:#ff7875}
+.btn-resubmit{background:#faad14;color:#fff}
+.btn-resubmit:hover{background:#ffc53d}
+/* ===== Status Tags ===== */
+.tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:500}
+.tag-pending{background:#fff7e6;color:#d46b08;border:1px solid #ffd591}
+.tag-approved{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f}
+.tag-rejected{background:#fff1f0;color:#cf1322;border:1px solid #ffa39e}
+/* ===== Timeline ===== */
+.timeline{position:relative;padding-left:22px;margin-top:10px}
+.timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:#e8e8e8}
+.tl-item{position:relative;padding:0 0 14px 14px;font-size:13px;line-height:1.6}
+.tl-item:last-child{padding-bottom:0}
+.tl-item::before{content:'';position:absolute;left:-16px;top:6px;width:10px;height:10px;border-radius:50%;z-index:1}
+.tl-item.tl-submit::before{background:#1890ff}
+.tl-item.tl-approve::before{background:#52c41a}
+.tl-item.tl-reject::before{background:#ff4d4f}
+.tl-item .tl-time{color:#999;font-size:11px}
+.tl-item .tl-op{font-weight:500}
+.tl-item .tl-action{color:#666}
+.tl-item .tl-note{color:#666;font-style:italic;display:block;margin-top:2px;padding-left:14px;border-left:2px solid #e8e8e8}
+.tl-final{margin-top:4px;font-weight:600;font-size:13px}
+/* ===== Pagination ===== */
+.pagination{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0}
+.pagination .page-btn{padding:5px 11px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer;font-size:13px;color:#333;transition:all .2s;min-width:32px;text-align:center}
+.pagination .page-btn:hover:not(:disabled):not(.active){border-color:#1890ff;color:#1890ff}
+.pagination .page-btn.active{background:#1890ff;color:#fff;border-color:#1890ff;font-weight:500}
+.pagination .page-btn:disabled{color:#d9d9d9;cursor:not-allowed}
+.pagination .page-info{font-size:13px;color:#999;margin:0 8px}
+/* ===== Empty ===== */
+.empty{text-align:center;padding:48px 20px;color:#bbb;font-size:14px}
+.empty .icon{font-size:40px;margin-bottom:12px}
+/* ===== Toast ===== */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:slideDown .3s;max-width:460px;text-align:center}
+.toast-success{background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f}
+.toast-error{background:#fff1f0;color:#cf1322;border:1px solid #ffa39e}
+.toast-info{background:#e6f7ff;color:#096dd9;border:1px solid #91d5ff}
+@keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+/* ===== Modal ===== */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.active{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:28px;width:540px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal-box h3{font-size:16px;margin-bottom:16px;color:#333}
+.modal-box .form-group{margin-bottom:12px}
+.modal-box .modal-btns{display:flex;gap:10px;margin-top:18px}
+.modal-box .modal-btns button{flex:1;padding:9px;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500}
+.modal-box .modal-btns .btn-cancel{background:#f5f5f5;color:#666;border:1px solid #d9d9d9}
+.modal-box .modal-btns .btn-cancel:hover{background:#e8e8e8}
+/* ===== Responsive ===== */
+@media(max-width:640px){
+  .login-cards{flex-direction:column;align-items:center}
+  .login-card{width:280px}
+  .tabs{flex-direction:column}
+  .tab{padding:12px}
+  .card .card-header{flex-direction:column;align-items:flex-start}
+  .card .action-btns{flex-direction:column}
+  .topbar{padding:12px 16px;flex-wrap:wrap;gap:8px}
+  .pagination{flex-wrap:wrap}
+}
+/* ===== Export ===== */
+.export-btn{padding:7px 14px;background:#fff;border:1px dashed #d9d9d9;border-radius:6px;color:#999;font-size:12px;cursor:pointer;transition:all .2s;margin-top:12px}
+.export-btn:hover{border-color:#1890ff;color:#1890ff}
+</style>
+</head>
+<body>
+
+<div class="login-page" id="loginPage">
+  <h1>🏠 家庭OA审批管理系统</h1>
+  <div class="login-cards" id="loginCards"></div>
+</div>
+
+<div class="main-page" id="mainPage">
+  <div class="topbar">
+    <div class="user-info">
+      <span class="dot" id="userDot"></span>
+      <span class="name" id="userName"></span>
+      <span class="badge" id="pendingBadge" style="display:none">0</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">退出登录</button>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="submit" onclick="switchTab('submit')">📝 发起新申请</div>
+    <div class="tab" data-tab="approve" onclick="switchTab('approve')">⏳ 待我审批 <span class="tab-badge" id="approveBadge">0</span></div>
+    <div class="tab" data-tab="history" onclick="switchTab('history')">📋 全部历史记录</div>
+  </div>
+
+  <div class="tab-content">
+    <!-- 发起新申请 -->
+    <div class="tab-pane active" id="tab-submit">
+      <div class="form-group">
+        <label>OA需求描述 <span class="req">*</span></label>
+        <textarea id="f_desc" placeholder="请描述需要审批的事项" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>项目类别 <span class="req">*</span></label>
+        <select id="f_cat">
+          <option value="">请选择</option>
+          <option value="办公用品采购">办公用品采购</option>
+          <option value="家庭维修">家庭维修</option>
+          <option value="差旅报销">差旅报销</option>
+          <option value="礼金礼赠">礼金礼赠</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>预算金额 <span class="req">*</span></label>
+        <input type="number" id="f_budget" placeholder="请输入金额（元）" min="0" step="1">
+      </div>
+      <div class="form-group">
+        <label>执行时间 <span class="req">*</span></label>
+        <input type="date" id="f_date">
+      </div>
+      <div class="form-group">
+        <label>申请理由 <span class="req">*</span></label>
+        <textarea id="f_reason" placeholder="请详细说明申请理由" rows="3"></textarea>
+      </div>
+      <button class="submit-btn" id="submitBtn" onclick="submitRequest()" disabled>提交申请</button>
+    </div>
+
+    <!-- 待我审批 -->
+    <div class="tab-pane" id="tab-approve"></div>
+
+    <!-- 全部历史记录 -->
+    <div class="tab-pane" id="tab-history">
+      <div id="historyList"></div>
+      <div class="pagination" id="pagination"></div>
+      <button class="export-btn" onclick="exportData()">📥 导出全部记录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 再次提交 Modal -->
+<div class="modal-overlay" id="resubmitModal">
+  <div class="modal-box">
+    <h3>📄 再次提交</h3>
+    <div class="form-group">
+      <label>OA需求描述 <span class="req">*</span></label>
+      <textarea id="r_desc" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label>项目类别 <span class="req">*</span></label>
+      <select id="r_cat">
+        <option value="">请选择</option>
+        <option value="办公用品采购">办公用品采购</option>
+        <option value="家庭维修">家庭维修</option>
+        <option value="差旅报销">差旅报销</option>
+        <option value="礼金礼赠">礼金礼赠</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>预算金额 <span class="req">*</span></label>
+      <input type="number" id="r_budget" min="0" step="1">
+    </div>
+    <div class="form-group">
+      <label>执行时间 <span class="req">*</span></label>
+      <input type="date" id="r_date">
+    </div>
+    <div class="form-group">
+      <label>申请理由 <span class="req">*</span></label>
+      <textarea id="r_reason" rows="3"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeResubmit()">取消</button>
+      <button class="btn-approve" id="resubmitConfirmBtn" onclick="confirmResubmit()">确认提交</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Configuration =====
+const USERS = {
+  admin1: { name: '管理员一', password: 'admin123' },
+  admin2: { name: '管理员二', password: 'admin123' }
+};
+const APPROVAL_NEEDED = 1; // 2人系统，需另1人审批即可
+const PER_PAGE = 10;
+
+// ===== State =====
+let currentUser = null;
+let resubmitTarget = null; // 正在重新提交的原单据ID
+
+// ===== Init =====
+function init() {
+  renderLoginCards();
+  const saved = localStorage.getItem('oa_current_user');
+  if (saved && USERS[saved]) {
+    currentUser = saved;
+    enterMain();
+  }
+}
+
+// ===== Login =====
+function renderLoginCards() {
+  const c = document.getElementById('loginCards');
+  c.innerHTML = '';
+  const colors = { admin1: 'a1', admin2: 'a2' };
+  const icons = { admin1: '👤', admin2: '👤' };
+  Object.keys(USERS).forEach(key => {
+    const u = USERS[key];
+    const card = document.createElement('div');
+    card.className = 'login-card';
+    card.innerHTML = `
+      <div class="avatar ${colors[key]}">${icons[key]}</div>
+      <h3>${u.name}</h3>
+      <input type="password" id="pw_${key}" placeholder="输入密码" onkeydown="if(event.key==='Enter')login('${key}')">
+      <button class="login-btn" onclick="login('${key}')">登 录</button>
+      <div class="err" id="err_${key}"></div>
+    `;
+    c.appendChild(card);
+  });
+}
+
+function login(key) {
+  const pw = document.getElementById('pw_' + key).value;
+  const err = document.getElementById('err_' + key);
+  if (pw === USERS[key].password) {
+    currentUser = key;
+    localStorage.setItem('oa_current_user', key);
+    err.textContent = '';
+    enterMain();
+  } else {
+    err.textContent = '❌ 密码错误';
+  }
+}
+
+// ===== Main =====
+function enterMain() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('mainPage').classList.add('active');
+  const u = USERS[currentUser];
+  document.getElementById('userName').textContent = u.name;
+  const dot = document.getElementById('userDot');
+  dot.className = 'dot ' + (currentUser === 'admin1' ? 'a1' : 'a2');
+  switchTab('submit');
+  refreshUI();
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('oa_current_user');
+  document.getElementById('mainPage').classList.remove('active');
+  document.getElementById('loginPage').style.display = 'flex';
+  // clear password fields
+  document.querySelectorAll('.login-card input[type="password"]').forEach(el => el.value = '');
+  document.querySelectorAll('.login-card .err').forEach(el => el.textContent = '');
+}
+
+// ===== Tab Switching =====
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  if (name === 'approve') renderApprove();
+  if (name === 'history') renderHistory(1);
+}
+
+// ===== Refresh UI =====
+function refreshUI() {
+  updateBadge();
+  renderApprove();
+  renderHistory(1);
+  checkFormValid();
+}
+
+// ===== Update Badge =====
+function updateBadge() {
+  const approvals = getApprovals();
+  const pending = approvals.filter(a =>
+    a.status === 'pending' &&
+    a.creator !== currentUser &&
+    !a.approvedBy.includes(currentUser)
+  ).length;
+  const badge = document.getElementById('pendingBadge');
+  if (pending > 0) {
+    badge.textContent = pending;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+  document.getElementById('approveBadge').textContent = pending;
+}
+
+// ===== Data =====
+function getApprovals() {
+  try { return JSON.parse(localStorage.getItem('oa_approvals') || '[]'); } catch(e) { return []; }
+}
+
+function saveApprovals(data) {
+  localStorage.setItem('oa_approvals', JSON.stringify(data));
+}
+
+function generateId() {
+  const now = new Date();
+  const ds = now.getFullYear() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0');
+  const existing = getApprovals();
+  const today = existing.filter(a => a.id.startsWith('OA-' + ds + '-'));
+  const seq = String(today.length + 1).padStart(3, '0');
+  return 'OA-' + ds + '-' + seq;
+}
+
+function nowStr() {
+  const d = new Date();
+  return d.getFullYear() + '/' +
+    String(d.getMonth() + 1).padStart(2, '0') + '/' +
+    String(d.getDate()).padStart(2, '0') + ' ' +
+    String(d.getHours()).padStart(2, '0') + ':' +
+    String(d.getMinutes()).padStart(2, '0') + ':' +
+    String(d.getSeconds()).padStart(2, '0');
+}
+
+// ===== Submit =====
+function checkFormValid() {
+  const desc = document.getElementById('f_desc').value.trim();
+  const cat = document.getElementById('f_cat').value;
+  const budget = document.getElementById('f_budget').value;
+  const date = document.getElementById('f_date').value;
+  const reason = document.getElementById('f_reason').value.trim();
+  const valid = desc && cat && budget && date && reason;
+  document.getElementById('submitBtn').disabled = !valid;
+}
+
+// Attach event listeners
+['f_desc','f_cat','f_budget','f_date','f_reason'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', checkFormValid);
+  if (el && el.tagName === 'SELECT') el.addEventListener('change', checkFormValid);
+});
+
+function submitRequest() {
+  const desc = document.getElementById('f_desc').value.trim();
+  const cat = document.getElementById('f_cat').value;
+  const budget = document.getElementById('f_budget').value;
+  const date = document.getElementById('f_date').value;
+  const reason = document.getElementById('f_reason').value.trim();
+  if (!desc || !cat || !budget || !date || !reason) {
+    toast('请填写所有必填项', 'error');
+    return;
+  }
+  const approvals = getApprovals();
+  const record = {
+    id: generateId(),
+    creator: currentUser,
+    creatorName: USERS[currentUser].name,
+    description: desc,
+    category: cat,
+    budget: Number(budget),
+    executeDate: date,
+    reason: reason,
+    status: 'pending',
+    timeline: [{
+      type: 'submit',
+      operator: currentUser,
+      operatorName: USERS[currentUser].name,
+      time: nowStr(),
+      note: ''
+    }],
+    approvedBy: [],
+    rejectedBy: [],
+    createdAt: nowStr()
+  };
+  approvals.push(record);
+  saveApprovals(approvals);
+  // clear form
+  document.getElementById('f_desc').value = '';
+  document.getElementById('f_cat').value = '';
+  document.getElementById('f_budget').value = '';
+  document.getElementById('f_date').value = '';
+  document.getElementById('f_reason').value = '';
+  checkFormValid();
+  toast('✅ 提交成功，等待另一位管理员审批', 'success');
+  refreshUI();
+}
+
+// ===== Approve / Reject =====
+function approveItem(id) {
+  const noteEl = document.getElementById('note_' + id);
+  const note = noteEl ? noteEl.value.trim() : '';
+  const approvals = getApprovals();
+  const idx = approvals.findIndex(a => a.id === id);
+  if (idx === -1) return;
+  const rec = approvals[idx];
+  if (rec.status !== 'pending') return;
+  if (rec.creator === currentUser) { toast('不能审批自己的申请', 'error'); return; }
+  if (rec.approvedBy.includes(currentUser)) { toast('已审批过此单据', 'info'); return; }
+
+  rec.approvedBy.push(currentUser);
+  rec.timeline.push({
+    type: 'approve',
+    operator: currentUser,
+    operatorName: USERS[currentUser].name,
+    time: nowStr(),
+    note: note
+  });
+
+  // 2-person system: need only 1 other approval = approved!
+  // Check if ALL other non-creator accounts have approved
+  const otherAccounts = Object.keys(USERS).filter(k => k !== rec.creator);
+  const allApproved = otherAccounts.every(acc => rec.approvedBy.includes(acc));
+  if (allApproved) {
+    rec.status = 'approved';
+  }
+  // status stays 'pending' if not all approved yet
+
+  saveApprovals(approvals);
+  toast('✅ 已同意', 'success');
+  refreshUI();
+}
+
+function rejectItem(id) {
+  const noteEl = document.getElementById('note_' + id);
+  const note = noteEl ? noteEl.value.trim() : '';
+  if (!note) {
+    toast('请填写驳回理由', 'error');
+    return;
+  }
+  const approvals = getApprovals();
+  const idx = approvals.findIndex(a => a.id === id);
+  if (idx === -1) return;
+  const rec = approvals[idx];
+  if (rec.status !== 'pending') return;
+  if (rec.creator === currentUser) { toast('不能驳回自己的申请', 'error'); return; }
+
+  rec.status = 'rejected';
+  rec.rejectedBy.push(currentUser);
+  rec.timeline.push({
+    type: 'reject',
+    operator: currentUser,
+    operatorName: USERS[currentUser].name,
+    time: nowStr(),
+    note: note
+  });
+
+  saveApprovals(approvals);
+  toast('⛔ 已驳回', 'info');
+  refreshUI();
+}
+
+// ===== Resubmit =====
+function openResubmit(id) {
+  const approvals = getApprovals();
+  const rec = approvals.find(a => a.id === id);
+  if (!rec) return;
+  if (rec.creator !== currentUser) return;
+  if (rec.status !== 'rejected') return;
+  resubmitTarget = id;
+  document.getElementById('r_desc').value = rec.description;
+  document.getElementById('r_cat').value = rec.category;
+  document.getElementById('r_budget').value = rec.budget;
+  document.getElementById('r_date').value = rec.executeDate;
+  document.getElementById('r_reason').value = rec.reason;
+  document.getElementById('resubmitModal').classList.add('active');
+}
+
+function closeResubmit() {
+  document.getElementById('resubmitModal').classList.remove('active');
+  resubmitTarget = null;
+}
+
+function confirmResubmit() {
+  if (!resubmitTarget) return;
+  const desc = document.getElementById('r_desc').value.trim();
+  const cat = document.getElementById('r_cat').value;
+  const budget = document.getElementById('r_budget').value;
+  const date = document.getElementById('r_date').value;
+  const reason = document.getElementById('r_reason').value.trim();
+  if (!desc || !cat || !budget || !date || !reason) {
+    toast('请填写所有必填项', 'error');
+    return;
+  }
+  const approvals = getApprovals();
+  const record = {
+    id: generateId(),
+    creator: currentUser,
+    creatorName: USERS[currentUser].name,
+    description: desc,
+    category: cat,
+    budget: Number(budget),
+    executeDate: date,
+    reason: reason,
+    status: 'pending',
+    timeline: [{
+      type: 'submit',
+      operator: currentUser,
+      operatorName: USERS[currentUser].name,
+      time: nowStr(),
+      note: '（重新提交，原单 ' + resubmitTarget + '）'
+    }],
+    approvedBy: [],
+    rejectedBy: [],
+    createdAt: nowStr()
+  };
+  approvals.push(record);
+  saveApprovals(approvals);
+  closeResubmit();
+  toast('✅ 已重新提交，等待另一位管理员审批', 'success');
+  refreshUI();
+}
+
+// ===== Render Approve List =====
+function renderApprove() {
+  const el = document.getElementById('tab-approve');
+  const approvals = getApprovals();
+  const pending = approvals.filter(a =>
+    a.status === 'pending' &&
+    a.creator !== currentUser &&
+    !a.approvedBy.includes(currentUser)
+  );
+  if (pending.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="icon">✅</div>暂无待审批的单据</div>';
+    return;
+  }
+  el.innerHTML = pending.map(r => renderCard(r, true)).join('');
+}
+
+// ===== Render Card =====
+function renderCard(r, showActions) {
+  const statusMap = {
+    pending: '<span class="tag tag-pending">⏳ 待审批</span>',
+    approved: '<span class="tag tag-approved">✅ 全部通过</span>',
+    rejected: '<span class="tag tag-rejected">⛔ 已驳回</span>'
+  };
+  const budgetStr = '¥ ' + Number(r.budget).toLocaleString();
+
+  let actions = '';
+  if (showActions && r.status === 'pending' && r.creator !== currentUser && !r.approvedBy.includes(currentUser)) {
+    actions = `
+      <div class="card-actions">
+        <textarea id="note_${r.id}" placeholder="填写附注（驳回必须填写理由）" rows="2"></textarea>
+        <div class="action-btns">
+          <button class="btn-approve" onclick="approveItem('${r.id}')">✅ 同意</button>
+          <button class="btn-reject" onclick="rejectItem('${r.id}')">⛔ 拒绝</button>
+        </div>
+      </div>`;
+  }
+  if (r.status === 'rejected' && r.creator === currentUser) {
+    actions = `
+      <div class="card-actions">
+        <div class="action-btns">
+          <button class="btn-resubmit" onclick="openResubmit('${r.id}')">🔄 再次提交</button>
+        </div>
+      </div>`;
+  }
+
+  const timelineHtml = r.timeline.map(t => {
+    const cls = 'tl-item tl-' + t.type;
+    const actionLabel = t.type === 'submit' ? '📋 发起申请' : (t.type === 'approve' ? '✅ 同意' : '⛔ 拒绝');
+    return `<div class="${cls}">
+      <span class="tl-time">[${t.time}]</span>
+      <span class="tl-op">${t.operatorName}</span>
+      <span class="tl-action">→ ${actionLabel}</span>
+      ${t.note ? '<span class="tl-note">附注：' + escapeHtml(t.note) + '</span>' : ''}
+    </div>`;
+  }).join('');
+
+  const finalLine = r.status === 'approved' ? '<div class="tl-final" style="color:#52c41a">✅ 最终状态：全部通过 ✓</div>' :
+    (r.status === 'rejected' ? '<div class="tl-final" style="color:#ff4d4f">⛔ 最终状态：已驳回 ✗</div>' :
+    '<div class="tl-final" style="color:#faad14">⏳ 最终状态：待审批</div>');
+
+  return `<div class="card">
+    <div class="card-header">
+      <span class="id">#${r.id}</span>
+      <div><span class="creator">发起人：${r.creatorName} · ${r.createdAt}</span> ${statusMap[r.status]}</div>
+    </div>
+    <div class="card-body">
+      <div class="row"><span class="label">需求描述</span><span class="val">${escapeHtml(r.description)}</span></div>
+      <div class="row"><span class="label">项目类别</span><span class="val">${r.category}</span></div>
+      <div class="row"><span class="label">预算金额</span><span class="val">${budgetStr}</span></div>
+      <div class="row"><span class="label">执行时间</span><span class="val">${r.executeDate}</span></div>
+      <div class="row"><span class="label">申请理由</span><span class="val">${escapeHtml(r.reason)}</span></div>
+    </div>
+    <div class="timeline">${timelineHtml}${finalLine}</div>
+    ${actions}
+  </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ===== History =====
+let historyPage = 1;
+
+function renderHistory(page) {
+  historyPage = page;
+  const el = document.getElementById('historyList');
+  const pagination = document.getElementById('pagination');
+  const approvals = getApprovals().slice().reverse(); // newest first
+
+  if (approvals.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="icon">📋</div>暂无审批记录</div>';
+    pagination.innerHTML = '';
+    return;
+  }
+
+  const total = approvals.length;
+  const totalPages = Math.ceil(total / PER_PAGE);
+  const p = Math.min(Math.max(1, page), totalPages);
+  const start = (p - 1) * PER_PAGE;
+  const pageData = approvals.slice(start, start + PER_PAGE);
+
+  el.innerHTML = pageData.map(r => renderCard(r, false)).join('');
+
+  // Pagination
+  let phtml = '';
+  phtml += `<button class="page-btn" onclick="renderHistory(${p - 1})" ${p <= 1 ? 'disabled' : ''}>‹</button>`;
+  const maxPages = Math.min(totalPages, 10);
+  let ps = Math.max(1, p - 4);
+  let pe = Math.min(totalPages, ps + maxPages - 1);
+  if (pe - ps + 1 < maxPages) ps = Math.max(1, pe - maxPages + 1);
+  for (let i = ps; i <= pe; i++) {
+    phtml += `<button class="page-btn ${i === p ? 'active' : ''}" onclick="renderHistory(${i})">${i}</button>`;
+  }
+  phtml += `<button class="page-btn" onclick="renderHistory(${p + 1})" ${p >= totalPages ? 'disabled' : ''}>›</button>`;
+  phtml += `<span class="page-info">第 ${p}/${totalPages} 页，共 ${total} 条</span>`;
+  pagination.innerHTML = phtml;
+}
+
+// ===== Export =====
+function exportData() {
+  const data = getApprovals();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'OA审批记录_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('📥 导出成功', 'success');
+}
+
+// ===== Toast =====
+function toast(msg, type) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => { el.remove(); }, 2500);
+}
+
+// ===== Boot =====
+init();
+</script>
+</body>
+</html>
