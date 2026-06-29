@@ -121,7 +121,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 }
 .export-btn{padding:7px 14px;background:#fff;border:1px dashed #d9d9d9;border-radius:6px;color:#999;font-size:12px;cursor:pointer;transition:all .2s;margin-top:12px}
 .export-btn:hover{border-color:#1890ff;color:#1890ff}
-.db-error{display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:16px 20px;margin-bottom:20px;font-size:13px;line-height:1.8;max-width:560px}
+/* ===== Upload ===== */
+.upload-area{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.upload-btn{display:flex;align-items:center;justify-content:center;width:80px;height:80px;border:1px dashed #d9d9d9;border-radius:8px;cursor:pointer;color:#bbb;font-size:28px;transition:all .2s;background:#fafafa}
+.upload-btn:hover{border-color:#1890ff;color:#1890ff;background:#f0f5ff}
+.upload-area input[type=file]{display:none}
+.preview-thumb{position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:1px solid #e8e8e8}
+.preview-thumb img{width:100%;height:100%;object-fit:cover}
+.preview-thumb .del{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ff4d4f;color:#fff;border:none;font-size:10px;cursor:pointer;line-height:18px;text-align:center}
+.upload-progress{font-size:11px;color:#999;padding:4px 0}
+/* ===== Image Gallery in Cards ===== */
+.img-gallery{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.img-gallery img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid #f0f0f0;cursor:pointer;transition:transform .2s}
+.img-gallery img:hover{transform:scale(1.1)}
+/* ===== Lightbox ===== */
+.lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:2000;justify-content:center;align-items:center;cursor:zoom-out}
+.lightbox.active{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain}
+</style>
 .db-error pre{background:#f5f5f5;padding:10px;border-radius:6px;margin:6px 0;font-size:12px;overflow-x:auto;text-align:left}
 .db-error a{color:#1890ff}
 </style>
@@ -176,6 +193,7 @@ CREATE POLICY "allow_all" ON approvals
       <div class="form-group"><label>预算金额</label><input type="number" id="f_budget" placeholder="请输入金额（元）" min="0" step="1"></div>
       <div class="form-group"><label>执行时间</label><input type="date" id="f_date"></div>
       <div class="form-group"><label>申请理由</label><textarea id="f_reason" placeholder="请详细说明申请理由" rows="3"></textarea></div>
+      <div class="form-group"><label>上传截图</label><div class="upload-area" id="uploadArea"><div class="upload-btn" onclick="document.getElementById('fileInput').click()">+</div><input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)"><div class="upload-progress" id="uploadProgress"></div></div></div>
       <button class="submit-btn" id="submitBtn" onclick="submitRequest()" disabled>提交申请</button>
     </div>
     <div class="tab-pane" id="tab-approve"></div>
@@ -197,6 +215,7 @@ CREATE POLICY "allow_all" ON approvals
     <div class="form-group"><label>预算金额</label><input type="number" id="r_budget" min="0" step="1"></div>
     <div class="form-group"><label>执行时间</label><input type="date" id="r_date"></div>
     <div class="form-group"><label>申请理由</label><textarea id="r_reason" rows="3"></textarea></div>
+    <div class="form-group"><label>上传截图</label><div class="upload-area" id="reuploadArea"><div class="upload-btn" onclick="document.getElementById('fileInput2').click()">+</div><input type="file" id="fileInput2" accept="image/*" multiple onchange="handleFiles2(this.files)"><div class="upload-progress" id="reuploadProgress"></div></div></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeResubmit()">取消</button>
       <button class="btn-approve" onclick="confirmResubmit()">确认提交</button>
@@ -218,6 +237,11 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 let currentUser = null;
 let resubmitTarget = null;
 let cached = [];
+let pendingFiles = [];          // 待上传的文件列表（主表单）
+let pendingFileUrls = [];       // 已上传的图片URL（主表单）
+let pendingFiles2 = [];         // 待上传的文件列表（再次提交）
+let pendingFileUrls2 = [];      // 已存在的图片URL（再次提交）
+const STORAGE_URL = SB_URL + '/storage/v1/object/oa-images';
 
 // ===== Supabase API（直接 fetch，不依赖任何外部 CDN）=====
 async function sbFetch(method, path, body) {
@@ -326,8 +350,16 @@ function chk() { document.getElementById('submitBtn').disabled = !(document.getE
 async function submitRequest() {
   const d = document.getElementById('f_desc').value.trim(), c = document.getElementById('f_cat').value, b = document.getElementById('f_budget').value, dt = document.getElementById('f_date').value, r = document.getElementById('f_reason').value.trim();
   if (!d || !c) { toast('请填写OA项目和项目类别','error'); return; }
+  // 上传截图
+  let images = [];
+  if (pendingFiles.length > 0) {
+    document.getElementById('submitBtn').textContent = '上传中...';
+    document.getElementById('submitBtn').disabled = true;
+    images = await uploadAllImages(pendingFiles, 'uploadProgress');
+    if (images === null) { toast('图片上传失败，请重试','error'); document.getElementById('submitBtn').textContent = '提交申请'; document.getElementById('submitBtn').disabled = false; return; }
+  }
   await refresh();
-  const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
+  const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', images: images, timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
   try { await upsert(rec); } catch(e) { toast('保存失败','error'); return; }
   // 推送通知
   try {
@@ -345,6 +377,8 @@ async function submitRequest() {
     });
   } catch(e) { /* 推送失败不影响主流程 */ }
   for (const id of ['f_desc','f_cat','f_budget','f_date','f_reason']) document.getElementById(id).value = '';
+  pendingFiles = []; document.getElementById('uploadProgress').innerHTML = '';
+  document.querySelectorAll('#uploadArea .preview-thumb').forEach(el => el.remove());
   chk(); toast('✅ 提交成功，等待另一位管理员审批','success'); await refresh();
 }
 
@@ -385,15 +419,34 @@ function openResubmit(id) {
   document.getElementById('r_budget').value = rec.budget;
   document.getElementById('r_date').value = rec.executeDate;
   document.getElementById('r_reason').value = rec.reason;
+  // 恢复已有图片
+  pendingFiles2 = [];
+  document.querySelectorAll('#reuploadArea .preview-thumb').forEach(el => el.remove());
+  const uploadBtn = document.querySelector('#reuploadArea .upload-btn');
+  if (rec.images && rec.images.length > 0) {
+    rec.images.forEach(url => {
+      const div = document.createElement('div'); div.className = 'preview-thumb';
+      div.innerHTML = `<img src="${url}" onclick="openLightbox('${url}')"><button class="del" onclick="this.parentElement.remove();pendingFiles2=pendingFiles2.filter(u=>u!=='${url}');pendingFileUrls2=pendingFileUrls2.filter(u=>u!=='${url}')">×</button>`;
+      document.getElementById('reuploadArea').insertBefore(div, uploadBtn);
+    });
+    pendingFileUrls2 = [...rec.images];
+  }
   document.getElementById('resubmitModal').classList.add('active');
 }
-function closeResubmit() { document.getElementById('resubmitModal').classList.remove('active'); resubmitTarget = null; }
+function closeResubmit() { document.getElementById('resubmitModal').classList.remove('active'); resubmitTarget = null; pendingFiles2 = []; pendingFileUrls2 = []; }
 async function confirmResubmit() {
   if (!resubmitTarget) return;
   const d = document.getElementById('r_desc').value.trim(), c = document.getElementById('r_cat').value, b = document.getElementById('r_budget').value, dt = document.getElementById('r_date').value, r = document.getElementById('r_reason').value.trim();
   if (!d || !c) { toast('请填写OA项目和项目类别','error'); return; }
+  // 上传新截图
+  let newUrls = [];
+  if (pendingFiles2.length > 0) {
+    newUrls = await uploadAllImages(pendingFiles2, 'reuploadProgress');
+    if (newUrls === null) { toast('图片上传失败','error'); return; }
+  }
+  const allImages = [...(pendingFileUrls2||[]), ...newUrls];
   await refresh();
-  const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '（重新提交，原单 '+resubmitTarget+'）' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
+  const rec = { id: genId(), creator: currentUser, creatorName: USERS[currentUser].name, description: d, category: c, budget: Number(b), executeDate: dt, reason: r, status: 'pending', images: allImages, timeline: [{ type:'submit', operator: currentUser, operatorName: USERS[currentUser].name, time: nowStr(), note: '（重新提交，原单 '+resubmitTarget+'）' }], approvedBy: [], rejectedBy: [], createdAt: nowStr() };
   try { await upsert(rec); closeResubmit(); toast('✅ 已重新提交','success'); await refresh(); } catch(e) { toast('提交失败','error'); }
 }
 
@@ -414,7 +467,7 @@ function card(r, act) {
     ac = `<div class="card-actions"><textarea id="note_${r.id}" placeholder="填写附注（驳回必须填写理由）" rows="2"></textarea><div class="action-btns"><button class="btn-approve" onclick="approveItem('${r.id}')">✅ 同意</button><button class="btn-reject" onclick="rejectItem('${r.id}')">⛔ 拒绝</button></div></div>`;
   if (r.status === 'rejected' && r.creator === currentUser)
     ac = `<div class="card-actions"><div class="action-btns"><button class="btn-resubmit" onclick="openResubmit('${r.id}')">🔄 再次提交</button></div></div>`;
-  return `<div class="card"><div class="card-header"><span class="id">#${r.id}</span><div><span class="creator">发起人：${r.creatorName} · ${r.createdAt}</span> ${s[r.status]}</div></div><div class="card-body"><div class="row"><span class="label">需求描述</span><span class="val">${h(r.description)}</span></div><div class="row"><span class="label">项目类别</span><span class="val">${r.category}</span></div><div class="row"><span class="label">预算金额</span><span class="val">¥ ${Number(r.budget).toLocaleString()}</span></div><div class="row"><span class="label">执行时间</span><span class="val">${r.executeDate}</span></div><div class="row"><span class="label">申请理由</span><span class="val">${h(r.reason)}</span></div></div><div class="timeline">${tl}${fin}</div>${ac}</div>`;
+  return `<div class="card"><div class="card-header"><span class="id">#${r.id}</span><div><span class="creator">发起人：${r.creatorName} · ${r.createdAt}</span> ${s[r.status]}</div></div><div class="card-body"><div class="row"><span class="label">需求描述</span><span class="val">${h(r.description)}</span></div><div class="row"><span class="label">项目类别</span><span class="val">${r.category}</span></div><div class="row"><span class="label">预算金额</span><span class="val">¥ ${Number(r.budget).toLocaleString()}</span></div><div class="row"><span class="label">执行时间</span><span class="val">${r.executeDate}</span></div><div class="row"><span class="label">申请理由</span><span class="val">${h(r.reason)}</span></div>${r.images && r.images.length > 0 ? '<div class="row"><span class="label">截图附件</span><span class="val"><div class="img-gallery">'+r.images.map(u=>`<img src="${u}" onclick="openLightbox('${u}')">`).join('')+'</div></span></div>' : ''}</div><div class="timeline">${tl}${fin}</div>${ac}</div>`;
 }
 function h(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
@@ -448,7 +501,67 @@ function toast(msg, t) {
   document.body.appendChild(el); setTimeout(() => el.remove(), 2500);
 }
 
+// ===== 图片上传 =====
+function handleFiles(files) {
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    if (f.size > 10*1024*1024) { toast('单张图片不能超过10MB','error'); continue; }
+    const idx = pendingFiles.length;
+    pendingFiles.push(f);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const div = document.createElement('div'); div.className = 'preview-thumb';
+      div.innerHTML = `<img src="${e.target.result}"><button class="del" onclick="this.parentElement.remove();pendingFiles[idx]=null;pendingFiles=pendingFiles.filter(Boolean)">×</button>`;
+      document.getElementById('uploadArea').insertBefore(div, document.querySelector('#uploadArea .upload-btn'));
+    };
+    reader.readAsDataURL(f);
+  }
+}
+function handleFiles2(files) {
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    if (f.size > 10*1024*1024) { toast('单张图片不能超过10MB','error'); continue; }
+    const idx = pendingFiles2.length;
+    pendingFiles2.push(f);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const div = document.createElement('div'); div.className = 'preview-thumb';
+      div.innerHTML = `<img src="${e.target.result}"><button class="del" onclick="this.parentElement.remove();pendingFiles2[idx]=null;pendingFiles2=pendingFiles2.filter(Boolean)">×</button>`;
+      document.getElementById('reuploadArea').insertBefore(div, document.querySelector('#reuploadArea .upload-btn'));
+    };
+    reader.readAsDataURL(f);
+  }
+}
+async function uploadAllImages(files, progressId) {
+  const el = document.getElementById(progressId);
+  const urls = [];
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const ext = f.name.split('.').pop().toLowerCase() || 'jpg';
+    const fname = Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+    el.textContent = `上传中 ${i+1}/${files.length}...`;
+    try {
+      const buf = await f.arrayBuffer();
+      const r = await fetch(STORAGE_URL + '/' + fname, {
+        method: 'PUT',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': f.type || 'application/octet-stream' },
+        body: buf
+      });
+      if (!r.ok) { console.error('Upload fail:', r.status, await r.text()); return null; }
+      urls.push(STORAGE_URL + '/' + fname);
+    } catch(e) { console.error('Upload error:', e); return null; }
+  }
+  el.textContent = '';
+  return urls;
+}
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('active');
+}
+
 init();
 </script>
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')"><img id="lightboxImg"></div>
 </body>
 </html>
