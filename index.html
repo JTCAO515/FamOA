@@ -467,6 +467,8 @@ function card(r, act) {
     ac = `<div class="card-actions"><textarea id="note_${r.id}" placeholder="填写附注（驳回必须填写理由）" rows="2"></textarea><div class="action-btns"><button class="btn-approve" onclick="approveItem('${r.id}')">✅ 同意</button><button class="btn-reject" onclick="rejectItem('${r.id}')">⛔ 拒绝</button></div></div>`;
   if (r.status === 'rejected' && r.creator === currentUser)
     ac = `<div class="card-actions"><div class="action-btns"><button class="btn-resubmit" onclick="openResubmit('${r.id}')">🔄 再次提交</button></div></div>`;
+  if (r.status === 'approved')
+    ac = `<div class="card-actions"><div class="action-btns"><button class="btn-cancel" onclick="confirmDelete('${r.id}')" style="border:1px solid #ff4d4f;color:#ff4d4f;background:#fff;flex:none;padding:6px 16px">🗑️ 删除记录</button></div></div>`;
   return `<div class="card"><div class="card-header"><span class="id">#${r.id}</span><div><span class="creator">发起人：${r.creatorName} · ${r.createdAt}</span> ${s[r.status]}</div></div><div class="card-body"><div class="row"><span class="label">需求描述</span><span class="val">${h(r.description)}</span></div><div class="row"><span class="label">项目类别</span><span class="val">${r.category}</span></div><div class="row"><span class="label">预算金额</span><span class="val">¥ ${Number(r.budget).toLocaleString()}</span></div><div class="row"><span class="label">执行时间</span><span class="val">${r.executeDate}</span></div><div class="row"><span class="label">申请理由</span><span class="val">${h(r.reason)}</span></div>${r.images && r.images.length > 0 ? '<div class="row"><span class="label">截图附件</span><span class="val"><div class="img-gallery">'+r.images.map(u=>`<img src="${u}" onclick="openLightbox('${u}')">`).join('')+'</div></span></div>' : ''}</div><div class="timeline">${tl}${fin}</div>${ac}</div>`;
 }
 function h(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -493,6 +495,22 @@ async function exportData() {
     a.download = 'OA审批记录_'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href);
     toast('📥 导出成功','success');
   } catch(e) { toast('导出失败','error'); }
+}
+
+// ===== 删除 =====
+async function confirmDelete(id) {
+  if (!confirm('确定要删除此记录吗？删除后不可恢复。')) return;
+  await doDelete(id);
+}
+async function doDelete(id) {
+  try {
+    await sbFetch('DELETE', '/rest/v1/approvals?id=eq.' + encodeURIComponent(id));
+    toast('🗑️ 记录已删除','success');
+    await refresh();
+    renderHistory(1);
+  } catch(e) {
+    toast('删除失败：' + (e.msg||'未知错误'),'error');
+  }
 }
 
 function toast(msg, t) {
